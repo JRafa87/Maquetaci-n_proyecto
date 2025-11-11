@@ -1,8 +1,8 @@
 streamlit
 streamlit-option
 pandas
-numpy=
-plotly=
-joblib=
-scikit-learn=
+numpy
+plotly
+joblib
+scikit-learn
 xlsxwriter
