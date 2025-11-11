@@ -1,72 +1,23 @@
 import streamlit as st
-from streamlit_option_menu import option_menu
 import pandas as pd
+import numpy as np
+
+st.set_page_config(page_title="Maqueta App", layout="wide")
 
 # ==========================
-# LOGIN SIMPLE
-# ==========================
-if "login_status" not in st.session_state:
-    st.session_state.login_status = False
-
-def login(usuario, clave):
-    if usuario == "admin" and clave == "1234":
-        st.session_state.login_status = True
-        st.success("✅ Login exitoso")
-    else:
-        st.error("Usuario o contraseña incorrectos")
-
-if not st.session_state.login_status:
-    st.markdown("<h1 style='text-align:center;'>🔑 Iniciar Sesión</h1>", unsafe_allow_html=True)
-    usuario = st.text_input("Usuario")
-    clave = st.text_input("Contraseña", type="password")
-    if st.button("Ingresar"):
-        login(usuario, clave)
-    st.stop()
-
-# ==========================
-# MENÚ LATERAL (PÁGINAS)
+# MENÚ LATERAL
 # ==========================
 with st.sidebar:
-    selected = option_menu(
-        menu_title="Menú Principal",
-        options=["🏠 Dashboard", "📝 CRUD Empleados", "📂 Predicción Lote", "🧮 Simulación Manual"],
-        icons=["house","pencil-square","file-earmark-text","calculator"],
-        menu_icon="cast",
-        default_index=0,
-        styles={
-            "container": {"padding": "5px", "background-color": "#f0f2f6"},
-            "icon": {"color": "darkblue", "font-size": "18px"},
-            "nav-link": {"font-size": "16px", "text-align": "left", "margin":"0px"},
-            "nav-link-selected": {"background-color": "#cce0ff"},
-        }
+    selected = st.radio(
+        "Menú",
+        ["📝 CRUD Empleados", "📂 Predicción Lote", "🧮 Simulación Manual"]
     )
-
-# ==========================
-# DASHBOARD
-# ==========================
-if selected == "🏠 Dashboard":
-    st.markdown("<h1 style='text-align:center;'>🏠 Dashboard</h1>", unsafe_allow_html=True)
-    
-    # Ejemplo de cards con KPIs
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Total Empleados", "120")
-    col2.metric("Promedio Renuncia", "12%")
-    col3.metric("Empleados en Riesgo", "8%")
-    col4.metric("Satisfacción Salarial", "3.8/5")
-    
-    # Card visual
-    st.markdown("""
-    <div style='background-color:white; padding:20px; border-radius:12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top:20px'>
-    <h3>Resumen General</h3>
-    <p>Aquí puedes mostrar gráficos, alertas, últimas novedades o indicadores clave de empleados.</p>
-    </div>
-    """, unsafe_allow_html=True)
 
 # ==========================
 # CRUD EMPLEADOS
 # ==========================
-elif selected == "📝 CRUD Empleados":
-    st.markdown("<h1 style='text-align:center;'>📝 Gestión de Empleados</h1>", unsafe_allow_html=True)
+if selected == "📝 CRUD Empleados":
+    st.markdown("<h1 style='text-align:center;'>📝 CRUD de Empleados</h1>", unsafe_allow_html=True)
     
     crud_option = st.radio("Acción", ["Crear", "Leer", "Actualizar", "Eliminar"], horizontal=True)
     
@@ -96,13 +47,16 @@ elif selected == "📂 Predicción Lote":
     st.markdown("""
     <div style='background-color:white; padding:20px; border-radius:12px; box-shadow:0 4px 8px rgba(0,0,0,0.1)'>
     <h3>Carga de archivo CSV o Excel</h3>
-    <p>Sección donde el usuario sube su archivo para ejecutar predicciones masivas.</p>
+    <p>Sube un archivo para ver cómo se mostrarían los resultados de la predicción.</p>
     </div>
     """, unsafe_allow_html=True)
     
     uploaded_file = st.file_uploader("Sube tu archivo", type=["csv","xlsx"])
     if uploaded_file:
         df = pd.read_csv(uploaded_file) if uploaded_file.name.endswith('.csv') else pd.read_excel(uploaded_file)
+        # Simular columna de probabilidad y recomendación
+        df['Probabilidad_Renuncia'] = np.random.rand(len(df))
+        df['Recomendacion'] = ["Ejemplo de recomendación"]*len(df)
         st.dataframe(df.head())
         st.success(f"Archivo cargado: {len(df)} registros")
 
@@ -112,19 +66,23 @@ elif selected == "📂 Predicción Lote":
 elif selected == "🧮 Simulación Manual":
     st.markdown("<h1 style='text-align:center;'>🧮 Simulación Manual</h1>", unsafe_allow_html=True)
     
-    st.markdown("""
-    <div style='background-color:white; padding:20px; border-radius:12px; box-shadow:0 4px 8px rgba(0,0,0,0.1)'>
-    <h3>Formulario de simulación</h3>
-    <p>Sección donde se ingresan datos manuales para simular la predicción de un empleado.</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
     col1, col2 = st.columns(2)
     with col1:
-        st.text_input("Nombre")
-        st.number_input("Edad", 18, 65, 30)
-        st.selectbox("Departamento", ["Ventas","RRHH","Tecnología"])
+        nombre = st.text_input("Nombre")
+        edad = st.slider("Edad", 18, 65, 30)
+        departamento = st.selectbox("Departamento", ["Ventas","RRHH","Tecnología"])
     with col2:
-        st.selectbox("Género", ["M","F"])
-        st.number_input("Ingreso mensual", 1000, 20000, 3500)
-        st.selectbox("¿Hace horas extra?", ["Sí","No"])
+        genero = st.selectbox("Género", ["M","F"])
+        ingreso = st.number_input("Ingreso mensual", 1000, 20000, 3500)
+        horas_extra = st.selectbox("¿Hace horas extra?", ["Sí","No"])
+    
+    if st.button("Simular predicción"):
+        prob = np.random.rand()
+        st.markdown(f"""
+            <div style='background-color:#f0f2f6; padding:15px; border-radius:10px; text-align:center;'>
+                <h3>Resultado de simulación</h3>
+                <p>Probabilidad de renuncia: <b style='color:{"red" if prob>0.5 else "green"}'>{prob:.1%}</b></p>
+                <p>Recomendación: Ejemplo de recomendación basada en datos ingresados.</p>
+            </div>
+        """, unsafe_allow_html=True)
+
