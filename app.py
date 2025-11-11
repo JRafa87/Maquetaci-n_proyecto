@@ -1,100 +1,80 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 
-st.set_page_config(page_title="Maqueta App", layout="wide")
+st.set_page_config(page_title="Maqueta Visual", layout="wide")
 
-# ==========================
-# MENÚ LATERAL
-# ==========================
+# ===== Menú lateral =====
 with st.sidebar:
     selected = st.radio(
         "Menú",
         ["👥 Gestión de Empleados", "📂 Predicción Lote", "🧮 Simulación Manual"]
     )
 
-# ==========================
-# GESTIÓN DE EMPLEADOS
-# ==========================
+# ===== Gestión de Empleados =====
 if selected == "👥 Gestión de Empleados":
-    st.markdown("<h1 style='text-align:center;'>👥 Gestión de Empleados</h1>", unsafe_allow_html=True)
-    
-    # Card informativa
+    st.markdown("<h1 style='text-align:center;'>Gestión de Empleados</h1>", unsafe_allow_html=True)
+
     st.markdown("""
-    <div style='background-color:white; padding:15px; border-radius:12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1)'>
-        <h3>Tabla de empleados</h3>
-        <p>Tabla de ejemplo con datos ficticios de empleados.</p>
+    <div style='background-color:#e0f7fa; padding:15px; border-radius:12px;'>
+        <h3>Tabla de Empleados</h3>
+        <p>Sección con datos de ejemplo (solo visual).</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    df = pd.DataFrame({
+        "ID": [1,2,3],
+        "Nombre": ["Ana","Luis","Carlos"],
+        "Departamento": ["Ventas","RRHH","Tecnología"],
+        "Cargo": ["Analista","Especialista","Ingeniero"]
+    })
+    st.dataframe(df)
+
+    st.markdown("""
+    <div style='background-color:#fff3e0; padding:15px; border-radius:12px; margin-top:10px;'>
+        <h3>Acciones (solo visual)</h3>
+        <p>Espacio para Crear, Actualizar y Eliminar empleados.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ===== Predicción desde archivo =====
+elif selected == "📂 Predicción Lote":
+    st.markdown("<h1 style='text-align:center;'>Predicción desde archivo</h1>", unsafe_allow_html=True)
+
+    st.markdown("""
+    <div style='background-color:#fff9c4; padding:15px; border-radius:12px;'>
+        <h3>Instrucciones</h3>
+        <p>Uploader simulado y tabla de resultados de ejemplo.</p>
     </div>
     """, unsafe_allow_html=True)
 
     # Tabla de ejemplo
-    df_empleados = pd.DataFrame({
-        "ID": [1,2,3,4],
-        "Nombre": ["Ana", "Luis", "Carlos", "Marta"],
-        "Departamento": ["Ventas","RRHH","Tecnología","Finanzas"],
-        "Cargo": ["Analista","Especialista","Ingeniero","Jefe"]
+    df = pd.DataFrame({
+        "Empleado": ["Ana","Luis","Carlos"],
+        "Probabilidad_Renuncia": ["30%","70%","45%"],
+        "Recomendación": ["Satisfacción laboral","Revisar carga","Seguir monitoreo"]
     })
-    st.dataframe(df_empleados)
+    st.dataframe(df)
 
-    # Card de acciones CRUD (solo visual)
-    st.markdown("""
-    <div style='background-color:white; padding:15px; border-radius:12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top:10px'>
-        <h3>Acciones</h3>
-        <p>Botones para Crear, Actualizar y Eliminar empleados (solo visual).</p>
-        <div style='display:flex; gap:10px'>
-            <button>Crear</button>
-            <button>Actualizar</button>
-            <button>Eliminar</button>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# ==========================
-# PREDICCION DESDE ARCHIVO
-# ==========================
-elif selected == "📂 Predicción Lote":
-    st.markdown("<h1 style='text-align:center;'>📂 Predicción desde archivo</h1>", unsafe_allow_html=True)
-
-    st.markdown("""
-    <div style='background-color:white; padding:15px; border-radius:12px; box-shadow:0 4px 8px rgba(0,0,0,0.1)'>
-        <h3>Carga de archivo CSV o Excel</h3>
-        <p>Sube un archivo para ver cómo se mostrarían los resultados de la predicción (simulado).</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    uploaded_file = st.file_uploader("Sube tu archivo", type=["csv","xlsx"])
-    if uploaded_file:
-        df = pd.read_csv(uploaded_file) if uploaded_file.name.endswith('.csv') else pd.read_excel(uploaded_file)
-        # Simular resultados
-        df['Probabilidad_Renuncia'] = np.random.rand(len(df))
-        df['Recomendacion'] = ["Recomendación de ejemplo"]*len(df)
-        st.dataframe(df.head())
-        st.success(f"Archivo cargado: {len(df)} registros")
-
-# ==========================
-# SIMULACION MANUAL
-# ==========================
+# ===== Simulación Manual =====
 elif selected == "🧮 Simulación Manual":
-    st.markdown("<h1 style='text-align:center;'>🧮 Simulación Manual</h1>", unsafe_allow_html=True)
-    
+    st.markdown("<h1 style='text-align:center;'>Simulación Manual</h1>", unsafe_allow_html=True)
+
     col1, col2 = st.columns(2)
     with col1:
-        nombre = st.text_input("Nombre")
-        edad = st.slider("Edad", 18, 65, 30)
-        departamento = st.selectbox("Departamento", ["Ventas","RRHH","Tecnología","Finanzas"])
+        st.text_input("Nombre")
+        st.slider("Edad", 18, 65, 30)
+        st.selectbox("Departamento", ["Ventas","RRHH","Tecnología","Finanzas"])
     with col2:
-        genero = st.selectbox("Género", ["M","F"])
-        ingreso = st.number_input("Ingreso mensual", 1000, 20000, 3500)
-        horas_extra = st.selectbox("¿Hace horas extra?", ["Sí","No"])
-    
-    if st.button("Simular predicción"):
-        prob = np.random.rand()
-        st.markdown(f"""
-            <div style='background-color:#f0f2f6; padding:15px; border-radius:10px; text-align:center;'>
-                <h3>Resultado de simulación</h3>
-                <p>Probabilidad de renuncia: <b style='color:{"red" if prob>0.5 else "green"}'>{prob:.1%}</b></p>
-                <p>Recomendación: Ejemplo de recomendación basada en datos ingresados.</p>
-            </div>
-        """, unsafe_allow_html=True)
+        st.selectbox("Género", ["M","F"])
+        st.number_input("Ingreso mensual", 1000, 20000, 3500)
+        st.selectbox("¿Hace horas extra?", ["Sí","No"])
+
+    st.markdown("""
+    <div style='background-color:#f0f4c3; padding:15px; border-radius:12px; margin-top:10px;'>
+        <h3>Resultado de simulación (visual)</h3>
+        <p>Probabilidad de renuncia y recomendación solo para mostrar diseño.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
 
 
